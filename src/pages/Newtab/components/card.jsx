@@ -1,5 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import './card.css';
+
 import { infinity } from 'ldrs';
 infinity.register('card-loading');
 
@@ -23,7 +25,12 @@ const Card = () => {
     <>
       <div aria-live="polite" aria-busy={isLoading}>
         {isLoading && <card-loading size="40" color="grey"></card-loading>}
-        {!isLoading && card && <img src={card.card_images[0].image_url} />}
+        {!isLoading && card && (
+          <>
+            <div className="bg__gradient"></div>
+            <img className="card" src={card.card_images[0].image_url} />
+          </>
+        )}
       </div>
     </>
   );
