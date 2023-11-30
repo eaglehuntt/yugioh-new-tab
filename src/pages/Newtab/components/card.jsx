@@ -1,5 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import Tilt from 'react-parallax-tilt';
+
 import './card.css';
 
 import { infinity } from 'ldrs';
@@ -24,11 +26,27 @@ const Card = () => {
   return (
     <>
       <div aria-live="polite" aria-busy={isLoading}>
-        {isLoading && <card-loading size="40" color="grey"></card-loading>}
+        {isLoading && <card-loading size="80" color="grey"></card-loading>}
         {!isLoading && card && (
           <>
             <div className="bg__gradient"></div>
-            <img className="card" src={card.card_images[0].image_url} />
+            <Tilt
+              glareEnable={true}
+              tiltMaxAngleX={10}
+              tiltMaxAngleY={20}
+              perspective={2000}
+              glareColor={'rgb(255,255,255)'}
+            >
+              <div className="tiltComponent card">
+                {
+                  <img
+                    className="card-img"
+                    src={card.card_images[0].image_url}
+                    draggable={false}
+                  />
+                }
+              </div>
+            </Tilt>
           </>
         )}
       </div>
