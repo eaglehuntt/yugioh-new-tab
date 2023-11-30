@@ -1,11 +1,10 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Tilt from 'react-parallax-tilt';
 import Fade from '@material-ui/core/Fade';
-
 import './card.css';
-
 import { infinity } from 'ldrs';
+
 infinity.register('card-loading');
 
 const getCard = async () => {
@@ -16,8 +15,12 @@ const getCard = async () => {
 const Card = () => {
   const [card, setCard] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [cardState, setCardState] = useState({
+    isActive: false,
+  });
 
   useEffect(() => {
+    // Get card data then set it to the card variable
     getCard().then((data) => {
       setCard(data);
       setTimeout(() => {
@@ -25,6 +28,17 @@ const Card = () => {
       }, 100);
     });
   }, []);
+
+  const handleClick = (data) => {
+    setCardState({ isActive: true });
+    console.log(data);
+  };
+
+  let cardClassName = 'tiltComponent card';
+
+  if (cardState.isActive) {
+    cardClassName += ' cardFocused';
+  }
 
   return (
     <>
@@ -49,7 +63,12 @@ const Card = () => {
                 perspective={2000}
                 glareColor={'rgb(255,255,255)'}
               >
-                <div className="tiltComponent card">
+                <div
+                  onClick={() => {
+                    handleClick(card);
+                  }}
+                  className={cardClassName}
+                >
                   {
                     <img
                       className="card-img"

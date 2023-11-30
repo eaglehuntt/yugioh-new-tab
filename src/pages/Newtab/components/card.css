@@ -65,7 +65,9 @@ body {
   z-index: 5;
 }
 
-.card-img {
+.cardFocused {
+  transform: scale(1.3);
+  transition: transform 300ms;
 }
 
 .card:hover {
