@@ -7,7 +7,7 @@ import { infinity } from 'ldrs';
 
 infinity.register('card-loading');
 
-const getCard = async () => {
+const getRandomCard = async () => {
   let response = await fetch('https://db.ygoprodeck.com/api/v7/randomcard.php');
   return response.json();
 };
@@ -21,7 +21,7 @@ const Card = () => {
 
   useEffect(() => {
     // Get card data then set it to the card variable
-    getCard().then((data) => {
+    getRandomCard().then((data) => {
       setCard(data);
       setTimeout(() => {
         setIsLoading(false);
@@ -30,14 +30,21 @@ const Card = () => {
   }, []);
 
   const handleClick = (data) => {
-    setCardState({ isActive: true });
-    console.log(data);
+    if (cardState.isActive) {
+      setCardState({ isActive: false });
+      return;
+    } else {
+      setCardState({ isActive: true });
+      console.log(data);
+    }
   };
 
-  let cardClassName = 'tiltComponent card';
+  let cardClassName = '';
 
   if (cardState.isActive) {
-    cardClassName += ' cardFocused';
+    cardClassName = 'tiltComponent card card-active';
+  } else {
+    cardClassName = 'tiltComponent card';
   }
 
   return (
@@ -55,30 +62,62 @@ const Card = () => {
         )}
         {!isLoading && card && (
           <>
-            <Fade in={!isLoading} style={{ transitionDelay: '300ms' }}>
-              <Tilt
-                glareEnable={true}
-                tiltMaxAngleX={10}
-                tiltMaxAngleY={20}
-                perspective={2000}
-                glareColor={'rgb(255,255,255)'}
-              >
-                <div
-                  onClick={() => {
-                    handleClick(card);
-                  }}
-                  className={cardClassName}
-                >
-                  {
-                    <img
-                      className="card-img"
-                      src={card.card_images[0].image_url}
-                      draggable={false}
-                    />
-                  }
-                </div>
-              </Tilt>
-            </Fade>
+            <div className="card-info-grid">
+              <div className={cardClassName}>
+                <Fade in={!isLoading} style={{ transitionDelay: '300ms' }}>
+                  <Tilt
+                    glareEnable={true}
+                    tiltMaxAngleX={10}
+                    tiltMaxAngleY={20}
+                    perspective={2000}
+                    glareColor={'rgb(255,255,255)'}
+                    tiltAngleYInitial={cardState.isActive ? -90 : null}
+                    tiltAngleXInitial={cardState.isActive ? 0 : null}
+                  >
+                    <div
+                      onClick={() => {
+                        handleClick(card);
+                      }}
+                    >
+                      {
+                        <img
+                          className="card-img"
+                          src={card.card_images[0].image_url}
+                          draggable={false}
+                        />
+                      }
+                    </div>
+                  </Tilt>
+                </Fade>
+              </div>
+              {cardState.isActive && (
+                <>
+                  <div className={cardClassName}>
+                    <Fade in={!isLoading} style={{ transitionDelay: '300ms' }}>
+                      <Tilt
+                        glareEnable={true}
+                        tiltMaxAngleX={10}
+                        tiltMaxAngleY={20}
+                        perspective={2000}
+                        glareColor={'rgb(255,255,255)'}
+                        tiltAngleYManual={cardState.isActive ? -20 : null}
+                        tiltAngleXManual={cardState.isActive ? 0 : null}
+                      >
+                        <div>
+                          {
+                            <img
+                              className="card-img"
+                              src={card.card_images[0].image_url}
+                              draggable={false}
+                            />
+                          }
+                        </div>
+                      </Tilt>
+                    </Fade>
+                  </div>
+                </>
+              )}
+            </div>
           </>
         )}
       </div>
