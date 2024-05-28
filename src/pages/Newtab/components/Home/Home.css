@@ -1,0 +1,5 @@
+.deck-button {
+  position: relative; /* Ensure button is not being overlapped */
+  z-index: 10; /* Ensure it's clickable */
+  pointer-events: auto; /* Ensure pointer events are enabled */
+}

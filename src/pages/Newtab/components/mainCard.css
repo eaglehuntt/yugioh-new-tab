@@ -4,7 +4,6 @@ body {
   justify-content: center;
   flex-direction: row;
   align-items: center;
-  /*gap: 3em;*/
   height: 100vh;
   width: 100vw;
 
@@ -58,12 +57,13 @@ body {
   }
 }
 
-.card {
+.mainCard {
   transition: all ease;
   cursor: pointer;
   z-index: 5;
   transition: transform 300ms, opacity 300ms;
   display: flex;
+  max-width: 100%;
 }
 
 .card-active {
@@ -83,7 +83,16 @@ body {
 .card-info-grid {
   display: flex;
   justify-content: center;
+  max-width: 350px;
 }
 .card-info {
   z-index: 10;
+}
+
+.img-container {
+  max-width: 100%;
+}
+
+.card-img {
+  max-width: 100%;
 }

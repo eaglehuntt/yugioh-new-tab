@@ -1,12 +1,12 @@
 import React from 'react';
-import Card from './components/card';
+import Home from './components/Home/home';
 import './Newtab.css';
 
 const Newtab = () => {
   return (
     <>
       <div className="bg__gradient"></div>
-      <Card></Card>
+      <Home />
     </>
   );
 };

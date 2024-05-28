@@ -2,7 +2,7 @@ import React from 'react';
 import { useRef, useState, useEffect } from 'react';
 import Tilt from 'react-parallax-tilt';
 import Fade from '@material-ui/core/Fade';
-import './card.css';
+import './mainCard.css';
 import { infinity } from 'ldrs';
 
 const TextComponent = () => {

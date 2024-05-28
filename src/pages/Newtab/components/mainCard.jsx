@@ -2,7 +2,7 @@ import React from 'react';
 import { useRef, useState, useEffect } from 'react';
 import Tilt from 'react-parallax-tilt';
 import Fade from '@material-ui/core/Fade';
-import './card.css';
+import './mainCard.css';
 import { infinity } from 'ldrs';
 
 infinity.register('card-loading');
@@ -12,7 +12,7 @@ const getRandomCard = async () => {
   return response.json();
 };
 
-const Card = () => {
+const mainCard = () => {
   const [card, setCard] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [cardState, setCardState] = useState({
@@ -42,9 +42,9 @@ const Card = () => {
   let cardClassName = '';
 
   if (cardState.isActive) {
-    cardClassName = 'tiltComponent card card-active';
+    cardClassName = 'tiltComponent mainCard card-active';
   } else {
-    cardClassName = 'tiltComponent card';
+    cardClassName = 'tiltComponent mainCard';
   }
 
   return (
@@ -67,12 +67,11 @@ const Card = () => {
                 <Fade in={!isLoading} style={{ transitionDelay: '300ms' }}>
                   <Tilt
                     glareEnable={true}
-                    tiltMaxAngleX={10}
-                    tiltMaxAngleY={20}
-                    perspective={2000}
+                    tiltMaxAngleX={5}
+                    tiltMaxAngleY={10}
+                    perspective={4000}
                     glareColor={'rgb(255,255,255)'}
-                    tiltAngleYInitial={cardState.isActive ? -90 : null}
-                    tiltAngleXInitial={cardState.isActive ? 0 : null}
+                    glareMaxOpacity={0.2}
                   >
                     <div
                       onClick={() => {
@@ -92,29 +91,7 @@ const Card = () => {
               </div>
               {cardState.isActive && (
                 <>
-                  <div className={cardClassName}>
-                    <Fade in={!isLoading} style={{ transitionDelay: '300ms' }}>
-                      <Tilt
-                        glareEnable={true}
-                        tiltMaxAngleX={10}
-                        tiltMaxAngleY={20}
-                        perspective={2000}
-                        glareColor={'rgb(255,255,255)'}
-                        tiltAngleYManual={cardState.isActive ? -20 : null}
-                        tiltAngleXManual={cardState.isActive ? 0 : null}
-                      >
-                        <div>
-                          {
-                            <img
-                              className="card-img"
-                              src={card.card_images[0].image_url}
-                              draggable={false}
-                            />
-                          }
-                        </div>
-                      </Tilt>
-                    </Fade>
-                  </div>
+                  <div className={cardClassName}></div>
                 </>
               )}
             </div>
@@ -125,4 +102,4 @@ const Card = () => {
   );
 };
 
-export default Card;
+export default mainCard;
