@@ -16,10 +16,12 @@ const Home = () => {
 
   return (
     <>
-      {showCard ? <MainCard /> : <Builder />}
-      <button className="deck-button" onClick={handleDeckButtonClick}>
+      <div className="home-container">
+        {showCard ? <MainCard /> : <Builder />}
+        {/* <button className="deck-button" onClick={handleDeckButtonClick}>
         DECKS
-      </button>
+      </button> */}
+      </div>
     </>
   );
 };

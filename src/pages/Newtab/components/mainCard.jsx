@@ -1,9 +1,9 @@
-import React from 'react';
-import { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Tilt from 'react-parallax-tilt';
 import Fade from '@material-ui/core/Fade';
 import './mainCard.css';
 import { infinity } from 'ldrs';
+import SearchBar from './SearchBar/searchBar';
 
 infinity.register('card-loading');
 
@@ -12,7 +12,7 @@ const getRandomCard = async () => {
   return response.json();
 };
 
-const mainCard = () => {
+const MainCard = () => {
   const [card, setCard] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [cardState, setCardState] = useState({
@@ -29,23 +29,17 @@ const mainCard = () => {
     });
   }, []);
 
-  const handleClick = (data) => {
-    if (cardState.isActive) {
-      setCardState({ isActive: false });
-      return;
-    } else {
-      setCardState({ isActive: true });
-      console.log(data);
-    }
+  const handleCardClick = (data) => {
+    setCardState((prevState) => ({
+      ...prevState,
+      isActive: !prevState.isActive,
+    }));
+    console.log(data);
   };
 
-  let cardClassName = '';
-
-  if (cardState.isActive) {
-    cardClassName = 'tiltComponent mainCard card-active';
-  } else {
-    cardClassName = 'tiltComponent mainCard';
-  }
+  let cardClassName = `tiltComponent mainCard ${
+    cardState.isActive ? 'card-active' : ''
+  }`;
 
   return (
     <>
@@ -69,37 +63,31 @@ const mainCard = () => {
                     glareEnable={true}
                     tiltMaxAngleX={5}
                     tiltMaxAngleY={10}
-                    perspective={4000}
+                    perspective={2000}
                     glareColor={'rgb(255,255,255)'}
                     glareMaxOpacity={0.2}
+                    tiltReverse={true}
+                    transitionSpeed={2000}
                   >
-                    <div
-                      onClick={() => {
-                        handleClick(card);
-                      }}
-                    >
-                      {
-                        <img
-                          className="card-img"
-                          src={card.card_images[0].image_url}
-                          draggable={false}
-                        />
-                      }
+                    <div onClick={() => handleCardClick(card)}>
+                      <img
+                        className="card-img"
+                        src={card.card_images[0].image_url}
+                        draggable={false}
+                      />
                     </div>
                   </Tilt>
                 </Fade>
               </div>
-              {cardState.isActive && (
-                <>
-                  <div className={cardClassName}></div>
-                </>
-              )}
             </div>
           </>
         )}
+      </div>
+      <div className="search-bar-container">
+        {cardState.isActive && <SearchBar isActive={cardState.isActive} />}
       </div>
     </>
   );
 };
 
-export default mainCard;
+export default MainCard;
