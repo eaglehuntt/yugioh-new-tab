@@ -99,6 +99,11 @@ const MainCard = () => {
     if (cards.length > 0) {
       setCard(cards[0]);
       setIsLoading(false);
+    } else {
+      const randomCard = await getRandomCard();
+      await addCardToDB(randomCard);
+      setCard(randomCard);
+      setIsLoading(false);
     }
   };
 
