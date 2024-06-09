@@ -10,11 +10,11 @@ const axios = Axios.create({
 
 const cache = {};
 
-const SearchBar = ({ isActive }) => {
+const SearchBar = ({ isActive, onCardSearch, onShuffle }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [name, setName] = useState('');
-  const [showShuffleButton, setShowShuffleButton] = useState(true); // State to manage shuffle button visibility
+  const [showShuffleButton, setShowShuffleButton] = useState(true);
   const searchBoxRef = useRef(null);
 
   useEffect(() => {
@@ -22,11 +22,11 @@ const SearchBar = ({ isActive }) => {
       if (
         searchBoxRef.current &&
         !searchBoxRef.current.contains(event.target) &&
-        !event.target.classList.contains('search-btn') // Check if the click is not on the search button
+        !event.target.classList.contains('search-btn')
       ) {
         setIsClicked(false);
         setTimeout(() => {
-          setShowShuffleButton(true); // Show shuffle button when search box is unclicked
+          setShowShuffleButton(true);
         }, 50);
       }
     };
@@ -40,7 +40,7 @@ const SearchBar = ({ isActive }) => {
   const handleClick = () => {
     if (!isClicked) {
       setIsClicked(true);
-      setShowShuffleButton(false); // Hide shuffle button when search box is clicked
+      setShowShuffleButton(false);
     }
   };
 
@@ -78,6 +78,7 @@ const SearchBar = ({ isActive }) => {
     for (let i = 0; i < Math.min(5, data.length); i++) {
       if (data[i].name.toUpperCase() === upperCaseInput) {
         console.log(data[i]);
+        onCardSearch(data[i]);
         return;
       }
     }
@@ -85,6 +86,7 @@ const SearchBar = ({ isActive }) => {
       console.log('No exact match found. Logging first result:');
       console.log(data[0]);
       alert('No exact match found. Showing the first result.');
+      onCardSearch(data[0]);
     } else {
       console.log('No results found');
       alert('No results found');
@@ -120,13 +122,12 @@ const SearchBar = ({ isActive }) => {
         </a>
       </div>
       {showShuffleButton && (
-        // Conditionally render the shuffle button based on showShuffleButton state
         <a
           href="#"
           className="shuffle-btn"
           onClick={(e) => {
             e.preventDefault();
-            // Add functionality for shuffle button
+            onShuffle();
           }}
         >
           <Shuffle />

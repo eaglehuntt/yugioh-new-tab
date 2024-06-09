@@ -12,21 +12,97 @@ const getRandomCard = async () => {
   return response.json();
 };
 
+const openDB = () => {
+  return new Promise((resolve, reject) => {
+    let request = indexedDB.open('CardDatabase', 1);
+
+    request.onupgradeneeded = function (event) {
+      let db = event.target.result;
+      if (!db.objectStoreNames.contains('cards')) {
+        db.createObjectStore('cards', { keyPath: 'id' });
+      }
+    };
+
+    request.onsuccess = function (event) {
+      resolve(event.target.result);
+    };
+
+    request.onerror = function (event) {
+      reject('Database error: ' + event.target.errorCode);
+    };
+  });
+};
+
+const clearDB = async (db) => {
+  return new Promise((resolve, reject) => {
+    let transaction = db.transaction(['cards'], 'readwrite');
+    let objectStore = transaction.objectStore('cards');
+    let clearRequest = objectStore.clear();
+
+    clearRequest.onsuccess = function () {
+      resolve();
+    };
+
+    clearRequest.onerror = function (event) {
+      reject('Unable to clear data: ' + event.target.error);
+    };
+  });
+};
+
+const addCardToDB = async (card) => {
+  const db = await openDB();
+  await clearDB(db);
+
+  return new Promise((resolve, reject) => {
+    let transaction = db.transaction(['cards'], 'readwrite');
+    let objectStore = transaction.objectStore('cards');
+    let addRequest = objectStore.add(card);
+
+    addRequest.onsuccess = function () {
+      console.log('Card has been added to your database.');
+      resolve();
+    };
+
+    addRequest.onerror = function (event) {
+      reject('Unable to add data: ' + event.target.error);
+    };
+  });
+};
+
+const getCardFromDB = async () => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    let transaction = db.transaction(['cards'], 'readonly');
+    let objectStore = transaction.objectStore('cards');
+    let getRequest = objectStore.getAll();
+
+    getRequest.onsuccess = function (event) {
+      resolve(event.target.result);
+    };
+
+    getRequest.onerror = function (event) {
+      reject('Unable to retrieve data: ' + event.target.error);
+    };
+  });
+};
+
 const MainCard = () => {
-  const [card, setCard] = useState();
+  const [card, setCard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [cardState, setCardState] = useState({
     isActive: false,
   });
 
+  const loadCardFromDB = async () => {
+    const cards = await getCardFromDB();
+    if (cards.length > 0) {
+      setCard(cards[0]);
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Get card data then set it to the card variable
-    getRandomCard().then((data) => {
-      setCard(data);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 100);
-    });
+    loadCardFromDB();
   }, []);
 
   const handleCardClick = (data) => {
@@ -35,6 +111,21 @@ const MainCard = () => {
       isActive: !prevState.isActive,
     }));
     console.log(data);
+  };
+
+  const handleCardSearch = async (searchedCard) => {
+    setIsLoading(true);
+    await addCardToDB(searchedCard);
+    setCard(searchedCard);
+    setIsLoading(false);
+  };
+
+  const handleShuffle = async () => {
+    setIsLoading(true);
+    const randomCard = await getRandomCard();
+    await addCardToDB(randomCard);
+    setCard(randomCard);
+    setIsLoading(false);
   };
 
   let cardClassName = `tiltComponent mainCard ${
@@ -84,7 +175,13 @@ const MainCard = () => {
         )}
       </div>
       <div className="search-bar-container">
-        {cardState.isActive && <SearchBar isActive={cardState.isActive} />}
+        {cardState.isActive && (
+          <SearchBar
+            isActive={cardState.isActive}
+            onCardSearch={handleCardSearch}
+            onShuffle={handleShuffle}
+          />
+        )}
       </div>
     </>
   );
