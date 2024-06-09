@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Tilt from 'react-parallax-tilt';
 import Fade from '@material-ui/core/Fade';
 import './mainCard.css';
@@ -92,6 +92,7 @@ const MainCard = () => {
   const [cardState, setCardState] = useState({
     isActive: false,
   });
+  const searchBarRef = useRef(null);
 
   const loadCardFromDB = async () => {
     const cards = await getCardFromDB();
@@ -105,7 +106,23 @@ const MainCard = () => {
     loadCardFromDB();
   }, []);
 
-  const handleCardClick = (data) => {
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchBarRef.current && searchBarRef.current.contains(event.target)) {
+        return;
+      }
+      setCardState({ isActive: false });
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  const handleCardClick = (data, event) => {
+    event.stopPropagation();
     setCardState((prevState) => ({
       ...prevState,
       isActive: !prevState.isActive,
@@ -160,7 +177,7 @@ const MainCard = () => {
                     tiltReverse={true}
                     transitionSpeed={2000}
                   >
-                    <div onClick={() => handleCardClick(card)}>
+                    <div onClick={(event) => handleCardClick(card, event)}>
                       <img
                         className="card-img"
                         src={card.card_images[0].image_url}
@@ -174,7 +191,7 @@ const MainCard = () => {
           </>
         )}
       </div>
-      <div className="search-bar-container">
+      <div className="search-bar-container" ref={searchBarRef}>
         {cardState.isActive && (
           <SearchBar
             isActive={cardState.isActive}
