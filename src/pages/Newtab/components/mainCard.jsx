@@ -18,13 +18,22 @@ const openDB = () => {
 
     request.onupgradeneeded = function (event) {
       let db = event.target.result;
-      if (!db.objectStoreNames.contains('cards')) {
-        db.createObjectStore('cards', { keyPath: 'id' });
+      if (db) {
+        if (!db.objectStoreNames.contains('cards')) {
+          db.createObjectStore('cards', { keyPath: 'id' });
+        }
+      } else {
+        reject('Database creation failed: result is undefined');
       }
     };
 
     request.onsuccess = function (event) {
-      resolve(event.target.result);
+      let db = event.target.result;
+      if (db) {
+        resolve(db);
+      } else {
+        reject('Database opened but result is undefined');
+      }
     };
 
     request.onerror = function (event) {
@@ -49,23 +58,36 @@ const clearDB = async (db) => {
   });
 };
 
-const addCardToDB = async (card) => {
+const addCardToDB = async (card, isRandom) => {
   const db = await openDB();
   await clearDB(db);
 
   return new Promise((resolve, reject) => {
     let transaction = db.transaction(['cards'], 'readwrite');
     let objectStore = transaction.objectStore('cards');
-    let addRequest = objectStore.add(card);
 
-    addRequest.onsuccess = function () {
-      console.log('Card has been added to your database.');
-      resolve();
-    };
+    if (isRandom) {
+      // Lol for some reason the api changed and is not consistant
+      let addRequest = objectStore.add(card.data[0]);
+      addRequest.onsuccess = function () {
+        console.log('Random Card has been added to your database.');
+        resolve();
+      };
 
-    addRequest.onerror = function (event) {
-      reject('Unable to add data: ' + event.target.error);
-    };
+      addRequest.onerror = function (event) {
+        reject('Unable to add data: ' + event.target.error);
+      };
+    } else {
+      let addRequest = objectStore.add(card);
+      addRequest.onsuccess = function () {
+        console.log('Searched Card has been added to your database.');
+        resolve();
+      };
+
+      addRequest.onerror = function (event) {
+        reject('Unable to add data: ' + event.target.error);
+      };
+    }
   });
 };
 
@@ -101,8 +123,8 @@ const MainCard = () => {
       setIsLoading(false);
     } else {
       const randomCard = await getRandomCard();
-      await addCardToDB(randomCard);
-      setCard(randomCard);
+      await addCardToDB(randomCard, true);
+      setCard(randomCard.data[0]);
       setIsLoading(false);
     }
   };
@@ -137,7 +159,7 @@ const MainCard = () => {
 
   const handleCardSearch = async (searchedCard) => {
     setIsLoading(true);
-    await addCardToDB(searchedCard);
+    await addCardToDB(searchedCard, false);
     setCard(searchedCard);
     setIsLoading(false);
   };
@@ -145,7 +167,7 @@ const MainCard = () => {
   const handleShuffle = async () => {
     setIsLoading(true);
     const randomCard = await getRandomCard();
-    await addCardToDB(randomCard);
+    await addCardToDB(randomCard, true);
     setCard(randomCard);
     setIsLoading(false);
   };
