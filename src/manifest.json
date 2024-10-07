@@ -16,7 +16,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*", "<all_urls>"],
+      "matches": ["https://db.ygoprodeck.com/*"],
       "js": ["contentScript.bundle.js"],
       "css": ["content.styles.css"]
     }
